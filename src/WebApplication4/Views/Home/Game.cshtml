@@ -1,0 +1,225 @@
+﻿@model Poker.ViewModels.Game
+@{ViewData["Title"] = "Phil's Poker";}
+
+<script type="text/javascript">
+    var stage = 0;
+    var wallet = @Model.playerWallet;
+    var cpuWallet = @Model.cpuWallet;
+    var pot = 0;    
+</script>
+
+<div class="game" id="game" style="height:90%">
+    <div class="col-md-12">
+        <div class="col-md-6 col-md-offset-3" id="again" style="display:none;">
+            <h2>No surrender no retreat</h2>            
+                <form asp-controller="Home" asp-action="Game" method="post">
+                    <input id="i" name="i" type="hidden" value="">
+                    <input id="j" name="j" type="hidden" value="">
+                    <input type="submit" value="Play again?" class="btn btn-lg btn-success" />
+                </form>            
+        </div>
+        <div class="col-md-6 col-md-offset-3" id="bet" style="display:none">
+            <h2>Bet or Check?</h2>
+            @{
+                for (int i = 50; i < 200; i += 50)
+                {
+                    <button class="btn btn-lg btn-success" onclick="bet(@i)">Bet @i</button>
+                }
+                <button class="btn btn-lg btn-danger" onclick="bet(wallet)">All in</button>
+                <button class="btn btn-lg btn-default" onclick="bet(0)">Check</button>
+            }
+        </div>
+    </div>
+    <div class="col-md-3" id="playerHand" style="display:none">
+        <h2>Your hand</h2>
+        @for (int i = 0; i < 2; i++)
+        {
+            <img class="card" src="~/images/Cards/@Model.playerHand[i]" />
+        }
+        <h2 id="wallet" style="display:block">£ @Model.playerWallet</h2>
+    </div>
+    <div class="col-md-6" id="flop" style="display:none">
+        <h2>Flop</h2>
+        <div>
+            @for (int i = 0; i < 3; i++)
+            {
+                <img class="card" src="~/images/Cards/@Model.flop[i]" />
+            }
+            <img style="display:none" id="turn" class="card" src="~/images/Cards/@Model.flop[3]" />
+            <img style="display:none" id="river" class="card" src="~/images/Cards/@Model.flop[4]" />
+            <h2 id="result" style="display:none">Winning hand: 
+                @{
+                    if (Model.result == 0)
+                    {
+                        @Model.cpuResult
+                    }
+                    else if (Model.result == 1)
+                    {
+                        @Model.playerResult
+                    }
+                }
+            </h2>
+
+        </div>
+    </div>
+    <div class="col-md-3" id="cpuHand" style="display:none">
+        <h2>Phil's hand</h2>
+        @for (int i = 0; i < 2; i++)
+        {
+            <img class="card" src="~/images/Cards/@Model.cpuHand[i]" />
+        }
+        <h2 id="cpuWallet" style="display:block">£ @Model.cpuWallet</h2>
+    </div>
+</div>
+
+
+
+<div class="row" id="phil">
+
+    <div class="col-md-6 col-md-offset-3">
+
+        <div id="philWait" style="display:none">
+            @{
+                Random rand1 = new Random();
+                <h1>Phil's weighing you up</h1>
+                <img class="phil" src="~/images/Phil/Wait/@(rand1.Next(1, 3)).jpg" alt="image" />
+            }
+        </div>
+        <div id="philResult" style="display:none">
+            @{
+                Random rand = new Random();
+                if (Model.result == 0)
+                {
+                    <h1>Phil won</h1>
+                    <img class="phil" src="~/images/Phil/Win/@(rand.Next(1,4)).jpg" alt="image" />
+                }
+                else if (Model.result == 1)
+                {
+                    <h1>Phil lost</h1>
+                    <img class="phil" src="~/images/Phil/Lose/@(rand.Next(1,5)).jpg" alt="image" />
+                }
+                else if (Model.result == 2)
+                {
+                    <h1>Draw</h1>
+                    <img class="phil" src="~/images/Phil/PhilDraw.jpg" alt="image" />
+                }
+
+            }
+        </div>
+        <div id="philLost" style="display:none">    
+            <h1>Phil's broke and drowning his sorrows</h1>
+            <img class="phil" src="~/images/Phil/PhilBroke.jpg" alt="image" />                
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    function bet()
+    {
+        @*@stage = 2;
+        @data.playerWallet -=50;
+        @data.cpuWallet -=50;
+        @pot += 100;*@
+    }
+
+    function hideAll() {
+        var divs = document.getElementsByTagName('div');
+        for (var i = divs.length; i-- ;) {
+            var div = divs[i];
+            if (div.id === 'game') {
+                div.style.display = 'none';
+            }
+        }
+    }
+
+    function show(x){
+        document.getElementById(x).style.display = 'inline';
+    }
+    function hide(x){
+        document.getElementById(x).style.display = 'none';
+    }
+
+    function bet(x){
+        if(x == 0){
+            stage++;
+        }
+        else if(x < wallet){
+            wallet -= x;
+            cpuWallet -= x;
+            pot += (x*2);
+            
+            document.getElementById("wallet").innerHTML = ('£ ' + wallet);            
+            stage++;
+        }
+        else if(x >= wallet){
+            cpuWallet -= wallet;
+            pot += (wallet*2);
+            wallet -= wallet; 
+            stage = 4;          
+        }
+        hide('bet');
+        checkStage();
+    }
+
+    function checkStage(){
+        switch(stage){
+            case 1:
+                show('flop')
+                show('bet')
+                break;
+            case 2:
+                show('turn')
+                show('bet')
+                break;
+            case 3:
+                show('river')
+                show('bet')
+                break;
+            case 4:               
+                show('flop')
+                show('turn')
+                show('river')
+                show('cpuHand')
+                hide('philWait')
+                show('again')
+                if(@Model.result == 0){
+                    cpuWallet += pot;                
+                }
+                else if(@Model.result == 1){
+                    wallet += pot;                
+                }
+                else{
+                    cpuWallet = @Model.cpuWallet;
+                    wallet = @Model.playerWallet;                
+                }
+                if(cpuWallet<=0){                    
+                    document.getElementById('philLost').style.display = 'block';
+                
+                }else{
+                    document.getElementById('philResult').style.display = 'block';                
+                }                   
+                document.getElementById('result').style.display = 'block';
+
+                document.getElementById('wallet').innerHTML = '£ '+ wallet;
+                document.getElementById('cpuWallet').innerHTML = '£ '+ cpuWallet;                
+                document.getElementById('i').value = wallet;
+                document.getElementById('j').value = cpuWallet;
+
+
+                break;
+
+        }
+
+    }
+
+    show('playerHand');
+    show('bet');
+
+    //show('turn');
+    //show('river');
+    //show('cpuHand');
+    show('philWait');
+    //hideAll();
+</script>

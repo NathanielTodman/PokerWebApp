@@ -1,0 +1,99 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        
+
+        @{
+            DealCards dc = new DealCards();
+            dc.Deal(500, 10000);
+            Poker.ViewModels.Game data = new Poker.ViewModels.Game();
+            int stage = 1;
+            int pot = 0;
+
+            data.result = dc.result;
+            data.playerHand = dc.RenameHands(dc.FirstPlayerHand);
+            data.cpuHand = dc.RenameHands(dc.FirstComputerHand);
+            data.flop = dc.RenameHands(dc.FlopHand);
+            data.playerWallet = dc.playerWallet;
+            data.cpuWallet = dc.cpuWallet;
+            data.playerResult = Convert.ToString(dc.winningPlayerHand);
+            data.cpuResult = Convert.ToString(dc.winningCpuHand);
+        }
+        <script type="text/javascript">
+
+        function bet()
+        {
+            @stage = 2;
+            @data.playerWallet -=50;
+            @data.cpuWallet -=50;
+            @pot += 100;
+        }
+        </script>
+
+
+
+
+        @{
+            @*Random rand = new Random();
+                if (data.result == 0)
+                {
+                    <h1>Phil won</h1>
+                    <img class="phil" src="~/images/Phil/Win/@(rand.Next(1, 4)).jpg" alt="image" />
+                }
+                else if (data.result == 1)
+                {
+                    <h1>Phil lost</h1>
+                    <img class="phil" src="~/images/Phil/Lose/@(rand.Next(1, 5)).jpg" alt="image" />
+                }
+                else if (data.result == 2)
+                {
+                    <h1>Draw</h1>
+                    <img class="phil" src="~/images/Phil/PhilDraw.jpg" alt="image" />
+                }*@
+
+        }
+    </div>
+</div>
+<div class="game">
+    @if (stage >= 1)
+    {
+        <div class="col-md-3">
+
+            <h2>Your hand</h2>
+            @for (int i = 0; i < 2; i++)
+            {
+                <img class="card" src="~/images/Cards/@data.playerHand[i]" />
+            }
+        </div>
+        @if (stage == 1)
+        {
+            <div class="col-md-6">
+                <h2>Bet or Check?</h2>
+                    <button class="btn btn-lg btn-success" onclick="bet()">Bet 50</button>
+            </div>
+        }
+    }
+    @if (stage >= 2)
+    {
+        <div class="col-md-6">
+            <h2>Flop</h2>
+            @for (int i = 0; i < 5; i++)
+            {
+                <img class="card" src="~/images/Cards/@data.flop[i]" />
+            }
+        </div>
+    }
+    @if (stage >= 3)
+    {
+        <div class="col-md-3">
+            <h2>Phil's hand</h2>
+            @for (int i = 0; i < 2; i++)
+            {
+                <img class="card" src="~/images/Cards/@data.cpuHand[i]" />
+            }
+            <h2>@data.cpuResult</h2>
+            }
+        </div>
+    }
+</div>
+
+
