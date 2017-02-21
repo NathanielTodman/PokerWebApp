@@ -63,6 +63,7 @@ namespace Poker
             FlopHand.CopyTo(ComputerHand, 2);
         }
 
+        //Sort cards by card value
         public void SortCards()
         {
             var QueryPlayer = from hand in PlayerHand
@@ -86,6 +87,7 @@ namespace Poker
             }
         }
 
+        // function to rename cards to match image names of card jpgs for displaying on page
         public string[] RenameHands(Card[] hand)
         {
             string[] newHand = new string[hand.Length];
@@ -104,17 +106,19 @@ namespace Poker
 
         public void EvaluateHands()
         {
-            //evaluate each players hand pre flop
+            //create each players hand evaluator object pre flop (to establish each players high cards)
             HandEvaluator firstPlayerHandEvaluator = new HandEvaluator(FirstPlayerHand);
             HandEvaluator firstComputerHandEvaluator = new HandEvaluator(FirstComputerHand);
 
-            //create player's computer's evaluation objects (passing SORTED hand to constructor)
+            //create player and cpu evaluation objects (passing SORTED hand to constructor)
             HandEvaluator playerHandEvaluator = new HandEvaluator(SortedPlayerHand);
             HandEvaluator computerHandEvaluator = new HandEvaluator(SortedComputerHand);
 
-            //get the player's and computer's hand
+            //evaluate the player's and computer's hand
             Hand playerHand = playerHandEvaluator.EvaluateHand();
             Hand computerHand = computerHandEvaluator.EvaluateHand();
+
+            //assign to public variable to send to model
             winningPlayerHand = playerHand;
             winningCpuHand = computerHand;
 

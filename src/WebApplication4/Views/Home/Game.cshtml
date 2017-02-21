@@ -1,12 +1,6 @@
 ﻿@model Poker.ViewModels.Game
 @{ViewData["Title"] = "Phil's Poker";}
 
-<script type="text/javascript">
-    var stage = 0;
-    var wallet = @Model.playerWallet;
-    var cpuWallet = @Model.cpuWallet;
-    var pot = 0;    
-</script>
 
 <div class="game" id="game" style="height:90%">
     <div class="col-md-12">
@@ -116,31 +110,23 @@
 
 <script type="text/javascript">
 
-    function bet()
-    {
-        @*@stage = 2;
-        @data.playerWallet -=50;
-        @data.cpuWallet -=50;
-        @pot += 100;*@
-    }
+    //initialise variables for wallets, phase and pot
+    var stage = 0;
+    var wallet = @Model.playerWallet;
+    var cpuWallet = @Model.cpuWallet;
+    var pot = 0;
 
-    function hideAll() {
-        var divs = document.getElementsByTagName('div');
-        for (var i = divs.length; i-- ;) {
-            var div = divs[i];
-            if (div.id === 'game') {
-                div.style.display = 'none';
-            }
-        }
-    }
-
+    //display hidden div
     function show(x){
         document.getElementById(x).style.display = 'inline';
     }
+
+    //hide div
     function hide(x){
         document.getElementById(x).style.display = 'none';
     }
 
+    //betting phase including validation (if player bets more than they have, auto all in)
     function bet(x){
         if(x == 0){
             stage++;
@@ -149,20 +135,21 @@
             wallet -= x;
             cpuWallet -= x;
             pot += (x*2);
-            
-            document.getElementById("wallet").innerHTML = ('£ ' + wallet);            
+
+            document.getElementById("wallet").innerHTML = ('£ ' + wallet);
             stage++;
         }
         else if(x >= wallet){
             cpuWallet -= wallet;
             pot += (wallet*2);
-            wallet -= wallet; 
-            stage = 4;          
+            wallet -= wallet;
+            stage = 4;
         }
         hide('bet');
         checkStage();
     }
 
+    //check phase of game to determine which divs to show
     function checkStage(){
         switch(stage){
             case 1:
@@ -177,7 +164,7 @@
                 show('river')
                 show('bet')
                 break;
-            case 4:               
+            case 4:
                 show('flop')
                 show('turn')
                 show('river')
@@ -185,25 +172,25 @@
                 hide('philWait')
                 show('again')
                 if(@Model.result == 0){
-                    cpuWallet += pot;                
+                    cpuWallet += pot;
                 }
                 else if(@Model.result == 1){
-                    wallet += pot;                
+                    wallet += pot;
                 }
                 else{
                     cpuWallet = @Model.cpuWallet;
-                    wallet = @Model.playerWallet;                
+                    wallet = @Model.playerWallet;
                 }
-                if(cpuWallet<=0){                    
+                if(cpuWallet<=0){
                     document.getElementById('philLost').style.display = 'block';
-                
+
                 }else{
-                    document.getElementById('philResult').style.display = 'block';                
-                }                   
+                    document.getElementById('philResult').style.display = 'block';
+                }
                 document.getElementById('result').style.display = 'block';
 
                 document.getElementById('wallet').innerHTML = '£ '+ wallet;
-                document.getElementById('cpuWallet').innerHTML = '£ '+ cpuWallet;                
+                document.getElementById('cpuWallet').innerHTML = '£ '+ cpuWallet;
                 document.getElementById('i').value = wallet;
                 document.getElementById('j').value = cpuWallet;
 
@@ -213,13 +200,8 @@
         }
 
     }
-
+    // initial divs to show at first phase
     show('playerHand');
     show('bet');
-
-    //show('turn');
-    //show('river');
-    //show('cpuHand');
     show('philWait');
-    //hideAll();
 </script>

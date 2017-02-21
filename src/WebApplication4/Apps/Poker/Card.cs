@@ -8,7 +8,7 @@ namespace Poker
 {
     public class Card
     {
-        // enum to provide values for cards from two to ace
+        // enum to provide key value pairs for cards from two to ace
         public enum Value
         {
             Two = 2, Three, Four, Five, Six, Seven, Eight,
